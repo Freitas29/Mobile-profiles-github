@@ -1,17 +1,59 @@
-import React, {FC, useState} from 'react';
-import {TextInput, Text, StyleSheet, View, Image} from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faBook, faUsers} from '@fortawesome/free-solid-svg-icons';
+import React, { FC, useState } from 'react';
+import { TextInput, Text, StyleSheet, View, Image } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faBook, faUsers } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 export interface User {
   name: string;
+  public_repos: string;
+  followers: number;
+  repos_url: string;
+  avatar_url: string;
 }
 
 const App: FC<User> = props => {
   const [username, setUsername] = useState(props.name);
+  const [user, setUser] = useState<User>();
 
   const handleUsername = (value: string) => {
     setUsername(value);
+  };
+
+  const fetchUser = async () => {
+    const {data} = await axios.get(`https://api.github.com/users/${username}`);
+    setUser(data);
+  };
+
+  const renderCard = () => {
+    if (user) {
+      return (
+        <View style={styles.list}>
+          <View style={styles.card}>
+            <View style={styles.cardTop}>
+              <Image
+                style={styles.imageCard}
+                source={{
+                  uri: user.avatar_url,
+                }}
+              />
+            </View>
+            <View style={styles.username}>
+              <Text style={styles.h1}>{user.name}</Text>
+            </View>
+
+            <View style={styles.description}>
+              <FontAwesomeIcon style={styles.icon} icon={faBook} size={24} />
+              <Text style={styles.h1}> {user.public_repos} repos</Text>
+            </View>
+            <View style={styles.description}>
+              <FontAwesomeIcon style={styles.icon} icon={faUsers} size={24} />
+              <Text style={styles.h1}> {user.followers} followers</Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
   };
 
   return (
@@ -21,34 +63,10 @@ const App: FC<User> = props => {
           <TextInput
             style={styles.input}
             onChangeText={event => handleUsername(event)}
+            onBlur={() => fetchUser()}
           />
         </View>
-
-        <View style={styles.list}>
-          <View style={styles.card}>
-            <View style={styles.cardTop}>
-              <Image
-                style={styles.imageCard}
-                source={{
-                  uri:
-                    'https://avatars0.githubusercontent.com/u/37782205?s=460&v=4',
-                }}
-              />
-            </View>
-            <View style={styles.username}>
-              <Text style={styles.h1}>Teste</Text>
-            </View>
-
-            <View style={styles.description}>
-              <FontAwesomeIcon style={styles.icon} icon={faBook} size={24} />
-              <Text style={styles.h1}> 2 repos</Text>
-            </View>
-            <View style={styles.description}>
-              <FontAwesomeIcon style={styles.icon} icon={faUsers} size={24} />
-              <Text style={styles.h1}>{username} 9 followers</Text>
-            </View>
-          </View>
-        </View>
+        {renderCard()}
       </View>
     </>
   );
@@ -111,7 +129,7 @@ const styles = StyleSheet.create({
   },
   h1: {
     color: '#D8D8D8',
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   text: {
