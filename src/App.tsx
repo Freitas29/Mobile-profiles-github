@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { TextInput, Text, StyleSheet, View, Image } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBook, faUsers } from '@fortawesome/free-solid-svg-icons';
+import Toast from 'react-native-simple-toast';
 import axios from 'axios';
 
 export interface User {
@@ -21,8 +22,14 @@ const App: FC<User> = props => {
   };
 
   const fetchUser = async () => {
-    const {data} = await axios.get(`https://api.github.com/users/${username}`);
-    setUser(data);
+    try {
+      const {data} = await axios.get(
+        `https://api.github.com/users/${username}`,
+      );
+      setUser(data);
+    } catch (e) {
+      Toast.show('User not found');
+    }
   };
 
   const renderCard = () => {
