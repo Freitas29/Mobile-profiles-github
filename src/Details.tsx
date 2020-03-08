@@ -1,8 +1,9 @@
-import React, {FC} from 'react';
-import {Text, View} from 'react-native';
+import React, { FC, useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+import axios from 'axios';
 
 type RootStackParamList = {
-  url: object;
+  url: string;
 };
 
 type Props = {
@@ -15,7 +16,21 @@ export interface Repos {
 }
 
 const App: FC<Repos> = props => {
-  const {url} = props.route.params;
+  const [userList, setUserList] = useState();
+  const url = props.route.params.url;
+
+  useEffect(() => {
+    const getRepos = async () => {
+      try {
+        const {data} = await axios.get(url);
+        setUserList(data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    getRepos();
+  }, [url]);
+
   return (
     <>
       <View>
