@@ -12,6 +12,8 @@ import {faBook, faUsers} from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-simple-toast';
 import axios from 'axios';
 import {StackNavigationProp} from '@react-navigation/stack';
+import AnimatedLoader from "react-native-animated-loader";
+
 
 type RootStackParamList = {
   repos_url: string;
@@ -34,12 +36,14 @@ export interface User {
 const App: FC<User> = props => {
   const [username, setUsername] = useState(props.name);
   const [user, setUser] = useState<User>();
+  const [loading, setLoading] = useState(false);
 
   const handleUsername = (value: string) => {
     setUsername(value);
   };
 
   const fetchUser = async () => {
+    setLoading(true);
     try {
       const {data} = await axios.get(
         `https://api.github.com/users/${username}`,
@@ -48,6 +52,7 @@ const App: FC<User> = props => {
     } catch (e) {
       Toast.show('User not found');
     }
+    setLoading(false);
   };
 
   const renderCard = () => {
@@ -96,8 +101,17 @@ const App: FC<User> = props => {
             onBlur={() => fetchUser()}
           />
         </View>
-
-        {renderCard()}
+        {loading ? (
+          <AnimatedLoader
+            animationStyle={styles.loading}
+            visible={loading}
+            overlayColor="rgba(0,0,0,1)"
+            source={require('./loadingAnimation.json')}
+            speed={1}
+          />
+        ) : (
+          renderCard()
+        )}
       </View>
     </>
   );
