@@ -4,6 +4,7 @@ import axios from 'axios';
 import Toast from 'react-native-simple-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCodeBranch, faStar } from '@fortawesome/free-solid-svg-icons';
+import AnimatedLoader from "react-native-animated-loader";
 
 
 type RootStackParamList = {
@@ -27,16 +28,20 @@ export interface Repos {
 
 const App: FC<Repos> = props => {
   const [userList, setUserList] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const url = props.route.params.url;
 
   useEffect(() => {
     const getRepos = async () => {
+      setLoading(true);
       try {
         const { data } = await axios.get(url);
         setUserList(data);
       } catch (e) {
         Toast.show('Error to fetch repos');
       }
+      setLoading(false);
     };
     getRepos();
   }, [url]);
@@ -66,11 +71,21 @@ const App: FC<Repos> = props => {
   return (
     <>
       <View style={styles.root}>
-        <FlatList
-          data={userList}
-          renderItem={({item}: {item: Repos}) => cardRepo(item)}
-          keyExtractor={(item: Repos) => item.id.toString()}
-        />
+        {loading ? (
+          <AnimatedLoader
+            animationStyle={styles.loading}
+            visible={loading}
+            overlayColor="rgba(0,0,0,1)"
+            source={require('./loadingAnimation.json')}
+            speed={1}
+          />
+        ) : (
+          <FlatList
+            data={userList}
+            renderItem={({item}: {item: Repos}) => cardRepo(item)}
+            keyExtractor={(item: Repos) => item.id.toString()}
+          />
+        )}
       </View>
     </>
   );
@@ -117,7 +132,10 @@ const styles = StyleSheet.create({
   p: {
     color: "#fff",
     fontSize: 20,
-  }
+  },
+  loading: {
+    width: 80,
+  },
 });
 
 export default App;
