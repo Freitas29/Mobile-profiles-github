@@ -54,7 +54,10 @@ const App: FC<User> = props => {
     if (user) {
       return (
         <View style={styles.list}>
-          <TouchableOpacity onPress={() => props.navigation.navigate('Repos')}>
+          <TouchableOpacity
+            onPress={() =>
+              props.navigation.navigate('Repos', {url: user.repos_url})
+            }>
             <View style={styles.card}>
               <View style={styles.cardTop}>
                 <Image
