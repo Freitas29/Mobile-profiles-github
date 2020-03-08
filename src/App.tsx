@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     color: '#fff',
-    fontSize: 120,
   },
   h1: {
     color: '#D8D8D8',
