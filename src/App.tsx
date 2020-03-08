@@ -6,9 +6,10 @@ import {
   View,
   Image,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faBook, faUsers} from '@fortawesome/free-solid-svg-icons';
+import {faBook, faUsers, faSignInAlt} from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-simple-toast';
 import axios from 'axios';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -30,6 +31,7 @@ export interface User {
   repos_url: string;
   avatar_url: string;
   navigation: ProfileScreenNavigationProp;
+  created_at: string;
 }
 
 const App: FC<User> = props => {
@@ -39,6 +41,10 @@ const App: FC<User> = props => {
 
   const handleUsername = (value: string) => {
     setUsername(value);
+  };
+
+  const formatDate = (date: String) => {
+    return date.split('T')[0];
   };
 
   const fetchUser = async () => {
@@ -83,6 +89,14 @@ const App: FC<User> = props => {
                 <FontAwesomeIcon style={styles.icon} icon={faUsers} size={24} />
                 <Text style={styles.h1}> {user.followers} followers</Text>
               </View>
+              <View style={styles.description}>
+                <FontAwesomeIcon
+                  style={styles.icon}
+                  icon={faSignInAlt}
+                  size={24}
+                />
+                <Text style={styles.h1}> {formatDate(user.created_at)}</Text>
+              </View>
             </View>
           </TouchableOpacity>
         </View>
@@ -92,9 +106,11 @@ const App: FC<User> = props => {
 
   return (
     <>
+      <StatusBar translucent barStyle="light-content" backgroundColor="#000" />
       <View style={styles.root}>
         <View style={styles.search}>
           <TextInput
+            selectionColor={'#000'}
             style={styles.input}
             onChangeText={event => handleUsername(event)}
             onBlur={() => fetchUser()}
