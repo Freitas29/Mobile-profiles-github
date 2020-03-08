@@ -1,19 +1,29 @@
-import React, { FC, useEffect, useState } from 'react';
-import { Text, View, StyleSheet, FlatList } from 'react-native';
+import React, {FC, useEffect, useState} from 'react';
+import {Text, View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-simple-toast';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCodeBranch, faStar } from '@fortawesome/free-solid-svg-icons';
-import AnimatedLoader from "react-native-animated-loader";
-
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faCodeBranch, faStar} from '@fortawesome/free-solid-svg-icons';
+import AnimatedLoader from 'react-native-animated-loader';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 type RootStackParamList = {
   url: string;
+  repos_url: string;
 };
 
 type Props = {
   params: RootStackParamList;
 };
+
+type DetailsStackParamList = {
+  repo: string;
+};
+
+type DetailsScreenNavigationProp = StackNavigationProp<
+  DetailsStackParamList,
+  'repo'
+>;
 
 export interface Repos {
   route: Props;
@@ -24,6 +34,7 @@ export interface Repos {
   language: string;
   stargazers_count: number;
   description: string;
+  navigation: DetailsScreenNavigationProp;
 }
 
 const App: FC<Repos> = props => {
@@ -36,7 +47,7 @@ const App: FC<Repos> = props => {
     const getRepos = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(url);
+        const {data} = await axios.get(url);
         setUserList(data);
       } catch (e) {
         Toast.show('Error to fetch repos');
@@ -49,21 +60,26 @@ const App: FC<Repos> = props => {
   const cardRepo = (item: Repos) => {
     return (
       <View style={styles.list}>
-        <View style={styles.card}>
-          <Text style={styles.h1}>{item.name}</Text>
-          <View style={styles.details}>
-            <View style={styles.detailsIcon}>
-              <FontAwesomeIcon icon={faCodeBranch} size={24} />
-              <Text style={styles.p}> {item.forks} </Text>
-            </View>
+        <TouchableOpacity
+          onPress={() =>
+            props.navigation.navigate('Repo', {repo: item.html_url})
+          }>
+          <View style={styles.card}>
+            <Text style={styles.h1}>{item.name}</Text>
+            <View style={styles.details}>
+              <View style={styles.detailsIcon}>
+                <FontAwesomeIcon icon={faCodeBranch} size={24} />
+                <Text style={styles.p}> {item.forks} </Text>
+              </View>
 
-            <View style={styles.detailsIcon}>
-              <FontAwesomeIcon icon={faStar} size={24} color={'#fdcb6e'} />
-              <Text style={styles.p}> {item.stargazers_count} </Text>
+              <View style={styles.detailsIcon}>
+                <FontAwesomeIcon icon={faStar} size={24} color={'#fdcb6e'} />
+                <Text style={styles.p}> {item.stargazers_count} </Text>
+              </View>
             </View>
+            <Text style={styles.description}>{item.description}</Text>
           </View>
-          <Text style={styles.description}>{item.description}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -130,7 +146,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   p: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
   },
   loading: {

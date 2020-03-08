@@ -12,8 +12,7 @@ import {faBook, faUsers} from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-simple-toast';
 import axios from 'axios';
 import {StackNavigationProp} from '@react-navigation/stack';
-import AnimatedLoader from "react-native-animated-loader";
-
+import AnimatedLoader from 'react-native-animated-loader';
 
 type RootStackParamList = {
   repos_url: string;
@@ -103,7 +102,6 @@ const App: FC<User> = props => {
         </View>
         {loading ? (
           <AnimatedLoader
-            animationStyle={styles.loading}
             visible={loading}
             overlayColor="rgba(0,0,0,1)"
             source={require('./loadingAnimation.json')}
