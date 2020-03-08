@@ -1,9 +1,26 @@
-import React, { FC, useState } from 'react';
-import { TextInput, Text, StyleSheet, View, Image } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBook, faUsers } from '@fortawesome/free-solid-svg-icons';
+import React, {FC, useState} from 'react';
+import {
+  TextInput,
+  Text,
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faBook, faUsers} from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-simple-toast';
 import axios from 'axios';
+import {StackNavigationProp} from '@react-navigation/stack';
+
+type RootStackParamList = {
+  repos_url: string;
+};
+
+type ProfileScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'repos_url'
+>;
 
 export interface User {
   name: string;
@@ -11,6 +28,7 @@ export interface User {
   followers: number;
   repos_url: string;
   avatar_url: string;
+  navigation: ProfileScreenNavigationProp;
 }
 
 const App: FC<User> = props => {
@@ -36,28 +54,30 @@ const App: FC<User> = props => {
     if (user) {
       return (
         <View style={styles.list}>
-          <View style={styles.card}>
-            <View style={styles.cardTop}>
-              <Image
-                style={styles.imageCard}
-                source={{
-                  uri: user.avatar_url,
-                }}
-              />
-            </View>
-            <View style={styles.username}>
-              <Text style={styles.h1}>{user.name}</Text>
-            </View>
+          <TouchableOpacity onPress={() => props.navigation.navigate('Repos')}>
+            <View style={styles.card}>
+              <View style={styles.cardTop}>
+                <Image
+                  style={styles.imageCard}
+                  source={{
+                    uri: user.avatar_url,
+                  }}
+                />
+              </View>
+              <View style={styles.username}>
+                <Text style={styles.h1}>{user.name}</Text>
+              </View>
 
-            <View style={styles.description}>
-              <FontAwesomeIcon style={styles.icon} icon={faBook} size={24} />
-              <Text style={styles.h1}> {user.public_repos} repos</Text>
+              <View style={styles.description}>
+                <FontAwesomeIcon style={styles.icon} icon={faBook} size={24} />
+                <Text style={styles.h1}> {user.public_repos} repos</Text>
+              </View>
+              <View style={styles.description}>
+                <FontAwesomeIcon style={styles.icon} icon={faUsers} size={24} />
+                <Text style={styles.h1}> {user.followers} followers</Text>
+              </View>
             </View>
-            <View style={styles.description}>
-              <FontAwesomeIcon style={styles.icon} icon={faUsers} size={24} />
-              <Text style={styles.h1}> {user.followers} followers</Text>
-            </View>
-          </View>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -73,6 +93,7 @@ const App: FC<User> = props => {
             onBlur={() => fetchUser()}
           />
         </View>
+
         {renderCard()}
       </View>
     </>
