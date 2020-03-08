@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, FlatList } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-simple-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -15,12 +15,18 @@ type Props = {
 };
 
 export interface Repos {
-  name: string;
   route: Props;
+  id: number;
+  forks: number;
+  name: string;
+  html_url: string; // abrir webview
+  language: string;
+  stargazers_count: number;
+  description: string;
 }
 
 const App: FC<Repos> = props => {
-  const [userList, setUserList] = useState();
+  const [userList, setUserList] = useState([]);
   const url = props.route.params.url;
 
   useEffect(() => {
@@ -35,28 +41,36 @@ const App: FC<Repos> = props => {
     getRepos();
   }, [url]);
 
+  const cardRepo = (item: Repos) => {
+    return (
+      <View style={styles.list}>
+        <View style={styles.card}>
+          <Text style={styles.h1}>{item.name}</Text>
+          <View style={styles.details}>
+            <View style={styles.detailsIcon}>
+              <FontAwesomeIcon icon={faCodeBranch} size={24} />
+              <Text style={styles.p}> {item.forks} </Text>
+            </View>
+
+            <View style={styles.detailsIcon}>
+              <FontAwesomeIcon icon={faStar} size={24} color={'#fdcb6e'} />
+              <Text style={styles.p}> {item.stargazers_count} </Text>
+            </View>
+          </View>
+          <Text style={styles.description}>{item.description}</Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <>
       <View style={styles.root}>
-        <View style={styles.list}>
-          <View style={styles.card}>
-            <Text style={styles.h1}>ApiNode</Text>
-            <View style={styles.details}>
-              <View style={styles.detailsIcon}>
-                <FontAwesomeIcon icon={faCodeBranch} size={24} />
-                <Text style={styles.p}> 0 </Text>
-              </View>
-
-              <View style={styles.detailsIcon}>
-                <FontAwesomeIcon icon={faStar} size={24} color={ '#fdcb6e' }/>
-                <Text style={styles.p}> 0 </Text>
-              </View>
-            </View>
-            <Text style={styles.description}>
-              Uma api rest em NodeJs utilizando express e MongoDb. Essa api foi feita seguindo passos do Curso em Node
-            </Text>
-          </View>
-        </View>
+        <FlatList
+          data={userList}
+          renderItem={({item}: {item: Repos}) => cardRepo(item)}
+          keyExtractor={(item: Repos) => item.id.toString()}
+        />
       </View>
     </>
   );
